@@ -2,23 +2,24 @@
 
 choice=""
 download_dir="."
+link="$1"
 
 # main function
 download(){
     case $choice in 
         a)
-            if printf '%s' "$1" | grep -q "playlist"; then
-                yt-dlp --progress --console-title --extract-audio --audio-format mp3 -o '%(playlist_title)s/%(title)s-%(id)s.%(ext)s' "$1"
+            if printf '%s' "$link" | grep -q "playlist"; then
+                yt-dlp --progress --console-title --extract-audio --audio-format mp3 -o '%(playlist_title)s/%(title)s-%(id)s.%(ext)s' "$link"
             else
-                yt-dlp --progress --console-title --extract-audio --audio-format mp3 -o "$download_dir/%(title)s.%(ext)s" "$1"
+                yt-dlp --progress --console-title --extract-audio --audio-format mp3 -o "$download_dir/%(title)s.%(ext)s" "$link"
             fi
             ;;
 
         v)
-            if printf '%s' "$1" | grep -q "playlist"; then
-                yt-dlp --progress --console-title -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" -o '%(playlist_title)s/%(title)s-%(id)s.%(ext)s' "$1"
+            if printf '%s' "$link" | grep -q "playlist"; then
+                yt-dlp --progress --console-title -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" -o '%(playlist_title)s/%(title)s-%(id)s.%(ext)s' "$link"
             else
-                yt-dlp --progress --console-title -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" -o "$download_dir/%(title)s.%(ext)s" "$1"
+                yt-dlp --progress --console-title -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" -o "$download_dir/%(title)s.%(ext)s" "$link"
             fi;;
     esac
 }
@@ -35,14 +36,9 @@ menu_line_odd() {
 	printf "\033[1;34m[\033[1;33m%s\033[1;34m] \033[1;33m%s\033[0m\n" "$2" "$1"
 }
 
-menu_line_strong() {
-	# displays a warning (red) line of a menu line with $2 as an indicator in [] and $1 as the option
-	printf "\033[1;34m[\033[1;31m%s\033[1;34m] \033[1;31m%s\033[0m\n" "$2" "$1"
-}
-
 prompt () {
 	# prompts the user with message in $1-2 ($1 in blue, $2 in magenta) and saves the input to the variables in $REPLY and $REPLY2
-	printf "\033[1;34m%s\033[1;35m%s\033[1;34m: \033[0m" "$1"
+	printf "\033[1;34m%s\033[1;34m: \033[0m" "$1"
 }
 
 menu_line_alternate() {
@@ -56,10 +52,28 @@ menu_line_alternate() {
 	fi
 }
 
+prompt_link(){
+    prompt "Enter link" 
+    read -r link
+}
+
+download_prompt(){
+    printf "\033\033[1;33m%s\n" "Download location?"
+    prompt "Type in your download location of choice here, will default to current directory if none"
+    read -r download_dir
+    if [ -z "$download_dir" ]; then
+        download_dir='.' 
+    fi
+}
+if [ -z "$link" ]; then 
+    prompt_link 
+fi
 
 menu_line_alternate "Audio" "a"
 menu_line_alternate "Video" "v"
 prompt "Enter choice"
 read -r choice
-
+download_prompt
 download "$1"
+
+printf "Download complete!\n"
