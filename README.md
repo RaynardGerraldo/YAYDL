@@ -1,7 +1,7 @@
 # YAYDL
 Yet Another Youtube Downloader
 
-Just a fun project testing out yt-dlp
+Just a fun project testing out yt-dlp + learning shell
 
 # FEATURES
 * 2 options, audio and video
