@@ -69,11 +69,30 @@ if [ -z "$link" ]; then
     prompt_link 
 fi
 
-menu_line_alternate "Audio" "a"
-menu_line_alternate "Video" "v"
-prompt "Enter choice"
-read -r choice
+select_prompt(){
+    menu_line_alternate "Audio" "a"
+    menu_line_alternate "Video" "v"
+    prompt "Enter choice"
+    read -r choice
+}
+
+select_prompt
 download_prompt
 download "$1"
 
-printf "Download complete!\n"
+if [ $? != 0 ];then 
+    tput clear
+    menu_line_alternate "Download failed, retry?" "r"
+    prompt "Enter choice"
+    read -r choice
+    if [ "$choice" = "r" ];then
+        prompt_link
+        select_prompt
+        download_prompt
+        download
+    else
+        exit
+    fi
+else
+    printf "Download complete!\n"
+fi
